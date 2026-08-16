@@ -5,32 +5,13 @@ proving crc15 is correct
 import sys
 
 from crc15 import bits_from_int, crc15
-
+from frame import build_covered_bits   
 
 def bits_from_bytes(data):
     out = []
     for byte in data:
         out += bits_from_int(byte, 8)
     return out
-
-
-def build_covered_bits(can_id, rtr, ide, r0, dlc, data):
-    """
-
-    SOF(1, dominant) + ID(11) + RTR(1) + IDE(1) + r0(1) + DLC(4) + data.
-    All fields MSB-first; data is byte 0 first, bit 7 first.
-
-    D7: a remote frame (RTR recessive) carries a DLC but ZERO data bytes
-    """
-    assert rtr == 1 or len(data) == dlc, f"dlc = {dlc} but {len(data)} data bytes"
-
-    data_bits = []
-
-    if rtr == 0:
-        for byte in data:
-            data_bits += bits_from_int(byte, 8)
-
-    return [0] + bits_from_int(can_id, 11) + [rtr] + [ide] + [r0] + bits_from_int(dlc, 4) + data_bits
 
 
 # Externally-sourced vectors. Format:
