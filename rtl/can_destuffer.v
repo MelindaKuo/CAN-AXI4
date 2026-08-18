@@ -32,11 +32,18 @@ module can_destuffer (
 
         else begin 
             o_bit_valid <= 1'b0; 
-
-            if(i_flush) begin 
-                run_len <= 3'd0; 
-                prev <= 1'b0; 
+            if(i_flush) begin
                 o_stuff_error <= 1'b0;
+                if(i_bit_valid) begin
+                    o_bit <= i_bit;
+                    o_bit_valid <= 1'b1;
+                    prev <= i_bit;
+                    run_len <= 3'd1;
+                end
+                else begin
+                    prev <= 1'b0;
+                    run_len <= 3'd0;
+                end
             end
 
             else if(i_bit_valid) begin
