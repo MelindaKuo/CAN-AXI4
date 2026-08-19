@@ -38,7 +38,7 @@ module tb_can_frame_fsm;
 
     //from crc to fsm 
 
-    wire [15:0] crc_out; 
+    wire [14:0] crc_out;
 
     //out fsm 
 
@@ -53,7 +53,7 @@ module tb_can_frame_fsm;
     always #5 clk = ~clk; 
 
 
-    can_destuffer u_destuff( .clk(clk), .rst_n(rst_n), .i_bit(i_bit), .i_bit_valid(i_bit_valid), .i_clear(i_clear), .i_flush(flush), .i_stuffing_en(stuffing_en) );
+    can_destuffer u_destuff (.clk(clk), .rst_n(rst_n), .i_bit(i_bit), .i_bit_valid(i_bit_valid), .i_stuffing_en(stuffing_en), .i_flush(flush), .o_bit(ds_bit), .o_bit_valid(ds_bit_valid), .o_stuff_error(ds_stuff_error));
 
 
     can_frame_fsm dut (.clk(clk), .rst_n(rst_n), .i_bit(ds_bit), .i_bit_valid(ds_bit_valid), .i_stuff_error(ds_stuff_error), .o_crc_clear(crc_clear), .o_crc_bit(crc_bit), .o_crc_bit_valid(crc_bit_valid), .i_crc(crc_out), .o_stuffing_en(stuffing_en), .o_flush(flush), .o_id(id), .o_rtr(rtr), .o_ide(ide), .o_r0(r0), .o_dlc(dlc), .o_data(data), .o_frame_done(frame_done), .o_frame_valid(frame_valid), .o_crc_error(crc_error), .o_form_error(form_error));
@@ -73,7 +73,16 @@ module tb_can_frame_fsm;
 
     always @(posedge clk) begin 
         if(frame_done) begin 
-            $fwrite(fd, "", "w"); 
+            // Must match model/gen_frame_stim.py's format_expected() exactly:
+            //   id rtr dlc <8 bytes> crc <crc><stuff><form>
+            // Byte 0 lives in o_data[7:0], so the bytes are emitted low slice
+            // first. crc_rx is internal to the FSM -- there is no port for the
+            // received CRC, so read it hierarchically.
+            $fwrite(fd, "%03X %0d %0X %02X%02X%02X%02X%02X%02X%02X%02X %04X %0d%0d%0d\n",
+                    id, rtr, dlc,
+                    data[7:0],   data[15:8],  data[23:16], data[31:24],
+                    data[39:32], data[47:40], data[55:48], data[63:56],
+                    dut.crc_rx, crc_error, ds_stuff_error, form_error);
             frame_count = frame_count +1; 
         end
 
@@ -88,12 +97,12 @@ module tb_can_frame_fsm;
         i_bit_valid = 1'b0; 
 
         if(stim[0] === 1'bx) begin 
-            $display("ERROR: STIM didn't load);
+            $display("ERROR: STIM didn't load");
             $finish;
         end
 
         if(stim[MAX_BITS-1] !== 1'bx) begin 
-            $display("ERROR: stim array full);
+            $display("ERROR: stim array full");
             $finish; 
         end 
 
@@ -112,7 +121,7 @@ module tb_can_frame_fsm;
 
         wait(rst_n === 1'b1);
 
-        for(i = 0; i< n; i= i+1) begin; 
+        for(i = 0; i< n; i= i+1) begin
             @(negedge clk);
             i_bit = stim[i];
             i_bit_valid = 1'b1;
