@@ -75,9 +75,8 @@ module tb_can_frame_fsm;
         if(frame_done) begin 
             // Must match model/gen_frame_stim.py's format_expected() exactly:
             //   id rtr dlc <8 bytes> crc <crc><stuff><form>
-            // Byte 0 lives in o_data[7:0], so the bytes are emitted low slice
-            // first. crc_rx is internal to the FSM -- there is no port for the
-            // received CRC, so read it hierarchically.
+            // Byte 0 lives in o_data[7:0]
+            // crc_rx is internal to the FSM 
             $fwrite(fd, "%03X %0d %0X %02X%02X%02X%02X%02X%02X%02X%02X %04X %0d%0d%0d\n",
                     id, rtr, dlc,
                     data[7:0],   data[15:8],  data[23:16], data[31:24],
