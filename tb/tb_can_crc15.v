@@ -10,7 +10,7 @@ module tb_can_crc15;
     reg i_bit_valid; 
     wire [14:0] o_crc; //output
 
-    reg [ 14:0] res; 
+    reg [14:0] result;
     
     
     
@@ -40,7 +40,7 @@ module tb_can_crc15;
 
                 i_bit_valid = 1'b1; 
                 @(negedge clk);
-            end+
+            end
 
             i_bit_valid = 1'b0; 
             crc = o_crc; 
@@ -60,7 +60,7 @@ module tb_can_crc15;
         #500000; 
         $display("TIMEOUT");
         $finish; 
-    end; 
+    end
 
     initial begin 
         i_clear = 1'b0; 
@@ -78,7 +78,7 @@ module tb_can_crc15;
         $display("vector 3: got %h expect 66da", result);
         if (result !== 15'h66DA) begin $display("FAIL"); $finish; end
 
-        $display("RC PASS");
+        $display("CRC PASS");
         $finish;
     end
 
