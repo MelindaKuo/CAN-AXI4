@@ -40,10 +40,6 @@ module can_destuffer (
                     prev <= i_bit;
                     run_len <= 3'd1;
                 end
-                else begin
-                    prev <= 1'b0;
-                    run_len <= 3'd0;
-                end
             end
 
             else if(i_bit_valid) begin
