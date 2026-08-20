@@ -143,6 +143,15 @@ module tb_can_frame_fsm;
         $display("Timeout");
         $finish; 
     end
+
+    initial begin 
+        $dumpfile("sim/frame_fsm.vcd");
+        $500000
+        $dumpvars(0, tb_can_frame_fsm);
+        #200000; 
+        $dumpoff; 
+    end 
+
 endmodule
 
 `default_nettype wire

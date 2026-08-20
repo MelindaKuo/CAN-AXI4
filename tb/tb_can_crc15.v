@@ -82,6 +82,12 @@ module tb_can_crc15;
         $finish;
     end
 
+    initial begin 
+        $dumpfile("sim/crc15.vcd");
+        $dumpvars(0, tb_can_crc15);
+    end
+
+
 endmodule
 
 
