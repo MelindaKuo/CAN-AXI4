@@ -146,7 +146,7 @@ module tb_can_frame_fsm;
 
     initial begin 
         $dumpfile("sim/frame_fsm.vcd");
-        $500000
+        #500000;
         $dumpvars(0, tb_can_frame_fsm);
         #200000; 
         $dumpoff; 

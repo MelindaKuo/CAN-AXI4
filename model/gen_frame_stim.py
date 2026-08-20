@@ -22,17 +22,17 @@ def write_bits(path, bits):
 def format_expected(p):
     exp= ""
 
-    exp += f"{p['can_id']:03X} {p['rtr']} {p['dlc']:X} "
+    exp += f"{p['can_id']:03x} {p['rtr']} {p['dlc']:x} "
 
     data_changed = (p['data'] + [0] * 8)[:8]
 
     data_str = ""
 
     for i in data_changed: 
-        data_str += f"{i:02X}"
+        data_str += f"{i:02x}"
 
 
-    exp += data_str + " " + f"{p['crc_received']:04X}" 
+    exp += data_str + " " + f"{p['crc_received']:04x}" 
 
     crc_flag = int(p['crc_error'])
     stuff_flag = int(p['stuff_error'])
